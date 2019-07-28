@@ -33,7 +33,9 @@
 
 ;;;###autoload
 (defun de/elfeed-search-filters (&optional search-filter-arg)
-  "Wrapper for better searching. Will prompt user for filter terms, or else use given argument. Can be use in a hook too."
+  "Wrapper for better searching.
+Will prompt user for filter terms, or else use given SEARCH-FILTER-ARG.
+Can be use in a hook too"
   (interactive)
   (unless search-filter-arg
     (setq search-filter-arg
@@ -61,8 +63,8 @@
   (elfeed-search-set-filter search-filter-arg))
 
 (defun dashboard-elfeed (list-size)
-  "Return a function which will insert git status for PROJECT-DIR.
-If UPDATE is non-nil, update the remote first with 'git remote update'."
+  "Add the elfeed functionality to dashboard.
+Makes the list as long as LIST-SIZE."
   (dashboard-insert-section
    "Elfeed:"
    ;; list generated for dashboard
