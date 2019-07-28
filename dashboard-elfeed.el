@@ -60,5 +60,21 @@
                            " "))
   (elfeed-search-set-filter search-filter-arg))
 
+(defun dashboard-elfeed (list-size)
+  "Return a function which will insert git status for PROJECT-DIR.
+If UPDATE is non-nil, update the remote first with 'git remote update'."
+  (dashboard-insert-section
+   "Elfeed:"
+   ;; list generated for dashboard
+   '("post1" "post2" "post3" "post4" "post5")
+   list-size
+   "b"
+   `(lambda (&rest ignore)
+      ;; decide what to do when user clicks on item
+      (print (intern ,el))
+      (dashboard-refresh-buffer))
+   ;; displays list in dashboard
+   (format "%s" el)))
+
 (provide 'dashboard-elfeed)
 ;;; dashboard-elfeed.el ends here
