@@ -5,7 +5,7 @@
 ;; Author: Khinshan Khan <khinshan.khan@gmail.com>
 ;; URL: https://github.com/kkhan01/emacs-dashboard-elfeed
 ;; Version: 0.0.1
-;; Package-Requires: ((emacs "24") (dashboard) (elfeed))
+;; Package-Requires: ((emacs "25.3") (dashboard "1.7.0-SNAPSHOT") (elfeed "3.1.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -30,6 +30,11 @@
 
 (require 'elfeed)
 (require 'dashboard)
+
+(defvar de/dashboard-search-filter "@6-months-ago +unread"
+  "Specify the search.
+Default value is \"@6-months-ago +unread\", it filters
+from elfeed from 6 months ago and unread. Refer to README.org")
 
 ;;;###autoload
 (defun de/elfeed-search-filters (&optional search-filter-arg)
@@ -66,15 +71,15 @@ Can be use in a hook too"
   "Return a list of size LIST-SIZE of the feeds from elfeed.
 Will ensure the database is updated.
 The elfeed buffers are purposefully not closed."
-  (message "TEST %d" list-size)
+  (switch-to-buffer "*elfeed-search*")
+  (elfeed-search-mode)
+  (switch-to-buffer "*dashboard*")
   `("post1" "post2" "post3" "post4" "post5"))
 
 (defun de/elfeed-list-interact (arg)
   "Act on a single argument, ARG, from the list."
-  (elfeed)
-  (elfeed-db-load)
-  (elfeed-update)
   (switch-to-buffer "*elfeed-search*")
+  (elfeed-search-mode)
   (print elfeed-search-entries))
 
 (defun dashboard-elfeed (list-size)
