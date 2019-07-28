@@ -62,18 +62,33 @@ Can be use in a hook too"
                            " "))
   (elfeed-search-set-filter search-filter-arg))
 
+(defun de/elfeed-list (list-size)
+  "Return a list of size LIST-SIZE of the feeds from elfeed.
+Will ensure the database is updated.
+The elfeed buffers are purposefully not closed."
+  (message "TEST %d" list-size)
+  `("post1" "post2" "post3" "post4" "post5"))
+
+(defun de/elfeed-list-interact (arg)
+  "Act on a single argument, ARG, from the list."
+  (elfeed)
+  (elfeed-db-load)
+  (elfeed-update)
+  (switch-to-buffer "*elfeed-search*")
+  (print elfeed-search-entries))
+
 (defun dashboard-elfeed (list-size)
   "Add the elfeed functionality to dashboard.
 Makes the list as long as LIST-SIZE."
   (dashboard-insert-section
    "Elfeed:"
    ;; list generated for dashboard
-   '("post1" "post2" "post3" "post4" "post5")
+   (de/elfeed-list list-size)
    list-size
    "b"
    `(lambda (&rest ignore)
       ;; decide what to do when user clicks on item
-      (print (intern ,el))
+      (de/elfeed-list-interact (intern ,el))
       (dashboard-refresh-buffer))
    ;; displays list in dashboard
    (format "%s" el)))
