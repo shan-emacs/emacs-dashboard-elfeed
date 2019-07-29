@@ -36,6 +36,17 @@
 Default value is \"@6-months-ago +unread\", it filters
 from elfeed from 6 months ago and unread. Refer to README.org")
 
+(defvar de/dashboard-search-filter-1 "@6-months-ago +unread"
+  "Refer to de/dashboard-search-filter.
+For the sake of having multiple filters.")
+
+(defvar de/dashboard-results nil
+  "Holder for transference from display to click.")
+
+(defvar de/dashboard-results-1 nil
+  "Refer to de/dashboard-results.
+For the sake of having multiple filters.")
+
 ;;;###autoload
 (defun de/elfeed-search-filters (&optional search-filter-arg)
   "Wrapper for better searching.
@@ -46,7 +57,7 @@ Can be use in a hook too"
     (setq search-filter-arg
           ;; ask for user input if need be
           (split-string (read-string "Enter your filter terms:") split-string-default-separators)))
-  ;; this is a slightly hacky solution to determine if time is provided
+  this is a slightly hacky solution to determine if time is provided
   (setq timewords '("-day-ago" "-days-ago" "-month-ago" "-months-ago" "-year-ago" "-years-ago"))
   (setq search-filter-arg (string-join
                            ;; normalize the search terms for elfeed filter function
@@ -67,36 +78,61 @@ Can be use in a hook too"
                            " "))
   (elfeed-search-set-filter search-filter-arg))
 
-(defun de/elfeed-list (list-size)
+(defun de/elfeed-list (list-size search-filter)
   "Return a list of size LIST-SIZE of the feeds from elfeed.
 Will ensure the database is updated.
+Filter is determined by SEARCH-FILTER (which user shouldn't interact with).
 The elfeed buffers are purposefully not closed."
   (switch-to-buffer "*elfeed-search*")
   (elfeed-search-mode)
+  (elfeed-db-load)
+  (elfeed-update)
+  (elfeed-search-set-filter search-filter)
+  (setq de/dashboard-results elfeed-search-entries)
+  (print de/dashboard-results)
   (switch-to-buffer "*dashboard*")
-  `("post1" "post2" "post3" "post4" "post5"))
+  de/dashboard-results)
 
-(defun de/elfeed-list-interact (arg)
-  "Act on a single argument, ARG, from the list."
+(defun de/elfeed-list-interact (arg res)
+  "Act on a single argument, ARG, from the list.
+Filter is determined by RES (which user shouldn't interact with)."
   (switch-to-buffer "*elfeed-search*")
-  (elfeed-search-mode)
-  (print elfeed-search-entries))
+  (elfeed-show-mode)
+  (elfeed-show-entry arg)
+  (kill-buffer "*elfeed-search*"))
+
+(defun dashboard-elfeed-template (key list-size search-filter res)
+  "Template for a dashboard section.
+ARGS: KEY LIST-SIZE SEARCH-FILTER RES."
+  (dashboard-insert-section
+   (concat "Elfeed: [" search-filter "]")
+   ;; list generated for dashboard
+   (de/elfeed-list list-size search-filter)
+   list-size
+   key
+   `(lambda (&rest ignore)
+      ;; decide what to do when user clicks on item
+      (de/elfeed-list-interact (intern ,el))
+      (dashboard-refresh-buffer) res)
+   ;; displays list in dashboard
+   (format "%s" el)))
 
 (defun dashboard-elfeed (list-size)
   "Add the elfeed functionality to dashboard.
 Makes the list as long as LIST-SIZE."
-  (dashboard-insert-section
-   "Elfeed:"
-   ;; list generated for dashboard
-   (de/elfeed-list list-size)
-   list-size
-   "b"
-   `(lambda (&rest ignore)
-      ;; decide what to do when user clicks on item
-      (de/elfeed-list-interact (intern ,el))
-      (dashboard-refresh-buffer))
-   ;; displays list in dashboard
-   (format "%s" el)))
+  (dashboard-elfeed-template "b"
+                             list-size
+                             de/dashboard-search-filter
+                             de/dashboard-results))
+
+(defun dashboard-elfeed-1 (list-size)
+    "Refer to dashboard-elfeed.
+For the sake of having multiple filters.
+ARGS: LIST-SIZE."
+    (dashboard-elfeed-template ""
+                               list-size
+                             de/dashboard-search-filter-1
+                             de/dashboard-results-1))
 
 (provide 'dashboard-elfeed)
 ;;; dashboard-elfeed.el ends here
