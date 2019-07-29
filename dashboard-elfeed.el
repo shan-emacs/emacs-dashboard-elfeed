@@ -42,39 +42,6 @@ from elfeed from 6 months ago and unread. Refer to README.org")
 (defvar de/dashboard-results nil
   "Holder for transference from display to click.")
 
-
-
-;;;###autoload
-(defun de/elfeed-search-filters (&optional search-filter-arg)
-  "Wrapper for better searching.
-Will prompt user for filter terms, or else use given SEARCH-FILTER-ARG.
-Can be use in a hook too"
-  (interactive)
-  (unless search-filter-arg
-    (setq search-filter-arg
-          ;; ask for user input if need be
-          (split-string (read-string "Enter your filter terms:") split-string-default-separators)))
-  this is a slightly hacky solution to determine if time is provided
-  (setq timewords '("-day-ago" "-days-ago" "-month-ago" "-months-ago" "-year-ago" "-years-ago"))
-  (setq search-filter-arg (string-join
-                           ;; normalize the search terms for elfeed filter function
-                           (mapcar (apply-partially (lambda (arg)
-                                                      (cond ((or (string-prefix-p "+" arg)
-                                                                 (string-prefix-p "-" arg)
-                                                                 (string-prefix-p "@" arg)
-                                                                 (string-prefix-p "#" arg)) arg)
-                                                            ;; determine if term is a time term
-                                                            ((member 't
-                                                                     (mapcar (apply-partially (lambda (timeword)
-                                                                                                (string-suffix-p timeword arg))) timewords))
-                                                             (concat "@" arg))
-                                                            ;; heuristic that everything not explicitly excluded is included
-                                                            (t (concat "+" arg)))
-                                                      ))
-                                   search-filter-arg)
-                           " "))
-  (elfeed-search-set-filter search-filter-arg))
-
 (defun de/pretty-entry (entry)
   "Return a string with ENTRY's important information in a nice format."
   (mapconcat 'identity
@@ -84,20 +51,23 @@ Can be use in a hook too"
                ,(mapconcat 'symbol-name (elfeed-entry-tags entry) ", "))
              " | "))
 
-(defun de/elfeed-list (list-size search-filter)
+(defmacro de/elfeed-list (list-size search-filter res)
   "Return a list of size LIST-SIZE of the feeds from elfeed.
 Will ensure the database is updated.
-Filter is determined by SEARCH-FILTER (which user shouldn't interact
- with).
-The elfeed buffers are purposefully not closed."
-  (switch-to-buffer "*elfeed-search*")
-  (elfeed-search-mode)
-  (elfeed-db-load)
-  (elfeed-update)
-  (elfeed-search-set-filter (concat search-filter " #" (number-to-string (+ 5 list-size))))
-  (setq de/dashboard-results (mapcar* 'cons (mapcar 'de/pretty-entry elfeed-search-entries) elfeed-search-entries))
-  (switch-to-buffer "*dashboard*")
-  (mapcar 'car de/dashboard-results))
+Filter is determined by SEARCH-FILTER and RES (which user shouldn't interact
+ with)."
+  `(progn
+     (set-buffer (get-buffer-create "*elfeed-search*"))
+     (elfeed-search-mode)
+     (elfeed-db-load)
+     (elfeed-update)
+     (setq de/search (concat ,search-filter " #" (number-to-string (+ 5 ,list-size))))
+     (elfeed-search-set-filter de/search)
+     (setq de/entries elfeed-search-entries)
+     (kill-buffer "*elfeed-search*")
+     (switch-to-buffer "*dashboard*")
+     (setq ,res (mapcar* 'cons (mapcar 'de/pretty-entry de/entries) de/entries))
+     (mapcar 'de/pretty-entry de/entries)))
 
 (defun de/elfeed-list-interact (arg)
   "Act on a single argument, ARG, from the list.
@@ -113,7 +83,7 @@ Makes the list as long as LIST-SIZE."
   (dashboard-insert-section
    (concat "Elfeed: [" de/dashboard-search-filter "]")
    ;; list generated for dashboard
-   (de/elfeed-list list-size de/dashboard-search-filter)
+   (de/elfeed-list list-size de/dashboard-search-filter de/dashboard-results)
    list-size
    de/key
    `(lambda (&rest ignore)
