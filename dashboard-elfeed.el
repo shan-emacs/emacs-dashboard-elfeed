@@ -69,13 +69,15 @@ Filter is determined by SEARCH-FILTER and RES (which user shouldn't interact
      (setq ,res (mapcar* 'cons (mapcar 'de/pretty-entry de/entries) de/entries))
      (mapcar 'de/pretty-entry de/entries)))
 
-(defun de/elfeed-list-interact (arg)
+(defun de/elfeed-list-interact (arg res)
   "Act on a single argument, ARG, from the list.
 Filter is determined by RES (which user shouldn't interact with)."
-  (switch-to-buffer "*elfeed-entry*")
-  (elfeed-show-mode)
-  (setq entry (nth (cl-position (symbol-name arg) (mapcar 'car de/dashboard-results) :test 'equal) (mapcar 'cdr de/dashboard-results)))
-  (elfeed-show-entry entry))
+  (let ((buffer (get-buffer-create "*elfeed-entry*")))
+    (with-current-buffer buffer
+      (elfeed-show-mode)
+      (setq de/entry (nth (cl-position arg (mapcar 'car res) :test 'equal) (mapcar 'cdr res)))
+      (elfeed-show-entry de/entry))
+    (switch-to-buffer buffer)))
 
 (defun dashboard-elfeed (list-size)
   "Add the elfeed functionality to dashboard.
@@ -86,10 +88,9 @@ Makes the list as long as LIST-SIZE."
    (de/elfeed-list list-size de/dashboard-search-filter de/dashboard-results)
    list-size
    de/key
+   ;; decide what to do when user clicks on item
    `(lambda (&rest ignore)
-      ;; decide what to do when user clicks on item
-      (de/elfeed-list-interact (intern ,el))
-      (dashboard-refresh-buffer))
+      (de/elfeed-list-interact ',el de/dashboard-results))
    ;; displays list in dashboard
    (format "%s" el)))
 
