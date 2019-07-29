@@ -102,16 +102,15 @@ The elfeed buffers are purposefully not closed."
 (defun de/elfeed-list-interact (arg)
   "Act on a single argument, ARG, from the list.
 Filter is determined by RES (which user shouldn't interact with)."
-  (switch-to-buffer "*elfeed-search*")
+  (switch-to-buffer "*elfeed-entry*")
   (elfeed-show-mode)
   (setq entry (nth (cl-position (symbol-name arg) (mapcar 'car de/dashboard-results) :test 'equal) (mapcar 'cdr de/dashboard-results)))
-  (elfeed-show-entry entry)
-  (kill-buffer "*elfeed-search*"))
+  (elfeed-show-entry entry))
 
 (defun dashboard-elfeed (list-size)
   "Add the elfeed functionality to dashboard.
 Makes the list as long as LIST-SIZE."
-(dashboard-insert-section
+  (dashboard-insert-section
    (concat "Elfeed: [" de/dashboard-search-filter "]")
    ;; list generated for dashboard
    (de/elfeed-list list-size de/dashboard-search-filter)
