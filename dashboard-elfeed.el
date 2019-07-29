@@ -42,54 +42,6 @@ from elfeed from 6 months ago and unread. Refer to README.org")
 (defvar de/dashboard-results nil
   "Holder for transference from display to click.")
 
-(defvar de/key-1 ""
-  "Refer to de/key.
-For the sake of having multiple filters.")
-
-(defvar de/dashboard-search-filter-1 "@6-months-ago +unread"
-  "Refer to de/dashboard-search-filter.
-For the sake of having multiple filters.")
-
-(defvar de/dashboard-results-1 nil
-  "Refer to de/dashboard-results.
-For the sake of having multiple filters.")
-
-(defvar de/key-2 ""
-  "Refer to de/key.
-For the sake of having multiple filters.")
-
-(defvar de/dashboard-search-filter-2 "@6-months-ago +unread"
-  "Refer to de/dashboard-search-filter.
-For the sake of having multiple filters.")
-
-(defvar de/dashboard-results-2 nil
-  "Refer to de/dashboard-results.
-For the sake of having multiple filters.")
-
-(defvar de/key-3 ""
-  "Refer to de/key.
-For the sake of having multiple filters.")
-
-(defvar de/dashboard-search-filter-3 "@6-months-ago +unread"
-  "Refer to de/dashboard-search-filter.
-For the sake of having multiple filters.")
-
-(defvar de/dashboard-results-3 nil
-  "Refer to de/dashboard-results.
-For the sake of having multiple filters.")
-
-(defvar de/key-4 ""
-  "Refer to de/key.
-For the sake of having multiple filters.")
-
-(defvar de/dashboard-search-filter-4 "@6-months-ago +unread"
-  "Refer to de/dashboard-search-filter.
-For the sake of having multiple filters.")
-
-(defvar de/dashboard-results-4 nil
-  "Refer to de/dashboard-results.
-For the sake of having multiple filters.")
-
 
 
 ;;;###autoload
@@ -132,93 +84,45 @@ Can be use in a hook too"
                ,(mapconcat 'symbol-name (elfeed-entry-tags entry) ", "))
              " | "))
 
-(defun de/create-associative (entry-cons res)
-  "Create an associative list for the ENTRY-CONS in the proper filter determined by RES."
-  (mapcar de/pretty-entry entry-cons))
-
-(defun de/elfeed-list (list-size search-filter res)
+(defun de/elfeed-list (list-size search-filter)
   "Return a list of size LIST-SIZE of the feeds from elfeed.
 Will ensure the database is updated.
-Filter is determined by SEARCH-FILTER and RES (which user shouldn't interact
+Filter is determined by SEARCH-FILTER (which user shouldn't interact
  with).
 The elfeed buffers are purposefully not closed."
   (switch-to-buffer "*elfeed-search*")
   (elfeed-search-mode)
   (elfeed-db-load)
   (elfeed-update)
-  (elfeed-search-set-filter search-filter)
-  (setq res (mapcar 'de/pretty-entry elfeed-search-entries))
-  ;; DEBUG (print de/dashboard-results)
+  (elfeed-search-set-filter (concat search-filter " #" (number-to-string (+ 5 list-size))))
+  (setq de/dashboard-results (mapcar* 'cons (mapcar 'de/pretty-entry elfeed-search-entries) elfeed-search-entries))
   (switch-to-buffer "*dashboard*")
-  res)
+  (mapcar 'car de/dashboard-results))
 
-(defun de/elfeed-list-interact (arg res)
+(defun de/elfeed-list-interact (arg)
   "Act on a single argument, ARG, from the list.
 Filter is determined by RES (which user shouldn't interact with)."
   (switch-to-buffer "*elfeed-search*")
   (elfeed-show-mode)
-  (elfeed-show-entry arg)
+  (setq entry (nth (cl-position (symbol-name arg) (mapcar 'car de/dashboard-results) :test 'equal) (mapcar 'cdr de/dashboard-results)))
+  (elfeed-show-entry entry)
   (kill-buffer "*elfeed-search*"))
-
-(defun dashboard-elfeed-template (key list-size search-filter res)
-  "Template for a dashboard section.
-ARGS: KEY LIST-SIZE SEARCH-FILTER RES."
-  (dashboard-insert-section
-   (concat "Elfeed: [" search-filter "]")
-   ;; list generated for dashboard
-   (de/elfeed-list list-size search-filter res)
-   list-size
-   key
-   `(lambda (&rest ignore)
-      ;; decide what to do when user clicks on item
-      (de/elfeed-list-interact (intern ,el))
-      (dashboard-refresh-buffer) res)
-   ;; displays list in dashboard
-   (format "%s" el)))
 
 (defun dashboard-elfeed (list-size)
   "Add the elfeed functionality to dashboard.
 Makes the list as long as LIST-SIZE."
-  (dashboard-elfeed-template de/key
-                             list-size
-                             de/dashboard-search-filter
-                             de/dashboard-results))
-
-(defun dashboard-elfeed-1 (list-size)
-  "Refer to dashboard-elfeed.
-For the sake of having multiple filters.
-ARGS: LIST-SIZE."
-  (dashboard-elfeed-template de/key-1
-                             list-size
-                             de/dashboard-search-filter-1
-                             de/dashboard-results-1))
-
-(defun dashboard-elfeed-2 (list-size)
-  "Refer to dashboard-elfeed.
-For the sake of having multiple filters.
-ARGS: LIST-SIZE."
-  (dashboard-elfeed-template de/key-2
-                             list-size
-                             de/dashboard-search-filter-2
-                             de/dashboard-results-2))
-
-(defun dashboard-elfeed-3 (list-size)
-  "Refer to dashboard-elfeed.
-For the sake of having multiple filters.
-ARGS: LIST-SIZE."
-  (dashboard-elfeed-template de/key-3
-                             list-size
-                             de/dashboard-search-filter-3
-                             de/dashboard-results-3))
-
-(defun dashboard-elfeed-4 (list-size)
-  "Refer to dashboard-elfeed.
-For the sake of having multiple filters.
-ARGS: LIST-SIZE."
-  (dashboard-elfeed-template de/key-4
-                             list-size
-                             de/dashboard-search-filter-4
-                             de/dashboard-results-4))
+(dashboard-insert-section
+   (concat "Elfeed: [" de/dashboard-search-filter "]")
+   ;; list generated for dashboard
+   (de/elfeed-list list-size de/dashboard-search-filter)
+   list-size
+   de/key
+   `(lambda (&rest ignore)
+      ;; decide what to do when user clicks on item
+      (de/elfeed-list-interact (intern ,el))
+      (dashboard-refresh-buffer))
+   ;; displays list in dashboard
+   (format "%s" el)))
 
 (provide 'dashboard-elfeed)
 ;;; dashboard-elfeed.el ends here
