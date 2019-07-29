@@ -31,21 +31,66 @@
 (require 'elfeed)
 (require 'dashboard)
 
+(defvar de/key ""
+  "Specify the key for shortcut on dashboard.")
+
 (defvar de/dashboard-search-filter "@6-months-ago +unread"
   "Specify the search.
 Default value is \"@6-months-ago +unread\", it filters
 from elfeed from 6 months ago and unread. Refer to README.org")
 
+(defvar de/dashboard-results nil
+  "Holder for transference from display to click.")
+
+(defvar de/key-1 ""
+  "Refer to de/key.
+For the sake of having multiple filters.")
+
 (defvar de/dashboard-search-filter-1 "@6-months-ago +unread"
   "Refer to de/dashboard-search-filter.
 For the sake of having multiple filters.")
 
-(defvar de/dashboard-results nil
-  "Holder for transference from display to click.")
-
 (defvar de/dashboard-results-1 nil
   "Refer to de/dashboard-results.
 For the sake of having multiple filters.")
+
+(defvar de/key-2 ""
+  "Refer to de/key.
+For the sake of having multiple filters.")
+
+(defvar de/dashboard-search-filter-2 "@6-months-ago +unread"
+  "Refer to de/dashboard-search-filter.
+For the sake of having multiple filters.")
+
+(defvar de/dashboard-results-2 nil
+  "Refer to de/dashboard-results.
+For the sake of having multiple filters.")
+
+(defvar de/key-3 ""
+  "Refer to de/key.
+For the sake of having multiple filters.")
+
+(defvar de/dashboard-search-filter-3 "@6-months-ago +unread"
+  "Refer to de/dashboard-search-filter.
+For the sake of having multiple filters.")
+
+(defvar de/dashboard-results-3 nil
+  "Refer to de/dashboard-results.
+For the sake of having multiple filters.")
+
+(defvar de/key-4 ""
+  "Refer to de/key.
+For the sake of having multiple filters.")
+
+(defvar de/dashboard-search-filter-4 "@6-months-ago +unread"
+  "Refer to de/dashboard-search-filter.
+For the sake of having multiple filters.")
+
+(defvar de/dashboard-results-4 nil
+  "Refer to de/dashboard-results.
+For the sake of having multiple filters.")
+
+
 
 ;;;###autoload
 (defun de/elfeed-search-filters (&optional search-filter-arg)
@@ -120,19 +165,46 @@ ARGS: KEY LIST-SIZE SEARCH-FILTER RES."
 (defun dashboard-elfeed (list-size)
   "Add the elfeed functionality to dashboard.
 Makes the list as long as LIST-SIZE."
-  (dashboard-elfeed-template "b"
+  (dashboard-elfeed-template de/key
                              list-size
                              de/dashboard-search-filter
                              de/dashboard-results))
 
 (defun dashboard-elfeed-1 (list-size)
-    "Refer to dashboard-elfeed.
+  "Refer to dashboard-elfeed.
 For the sake of having multiple filters.
 ARGS: LIST-SIZE."
-    (dashboard-elfeed-template ""
-                               list-size
+  (dashboard-elfeed-template de/key-1
+                             list-size
                              de/dashboard-search-filter-1
                              de/dashboard-results-1))
+
+(defun dashboard-elfeed-2 (list-size)
+  "Refer to dashboard-elfeed.
+For the sake of having multiple filters.
+ARGS: LIST-SIZE."
+  (dashboard-elfeed-template de/key-2
+                             list-size
+                             de/dashboard-search-filter-2
+                             de/dashboard-results-2))
+
+(defun dashboard-elfeed-3 (list-size)
+  "Refer to dashboard-elfeed.
+For the sake of having multiple filters.
+ARGS: LIST-SIZE."
+  (dashboard-elfeed-template de/key-3
+                             list-size
+                             de/dashboard-search-filter-3
+                             de/dashboard-results-3))
+
+(defun dashboard-elfeed-4 (list-size)
+  "Refer to dashboard-elfeed.
+For the sake of having multiple filters.
+ARGS: LIST-SIZE."
+  (dashboard-elfeed-template de/key-4
+                             list-size
+                             de/dashboard-search-filter-4
+                             de/dashboard-results-4))
 
 (provide 'dashboard-elfeed)
 ;;; dashboard-elfeed.el ends here
