@@ -123,20 +123,34 @@ Can be use in a hook too"
                            " "))
   (elfeed-search-set-filter search-filter-arg))
 
-(defun de/elfeed-list (list-size search-filter)
+(defun de/pretty-entry (entry)
+  "Return a string with ENTRY's important information in a nice format."
+  (mapconcat 'identity
+             `(,(cadr (elfeed-meta--plist (elfeed-entry-feed entry)))
+               ,(elfeed-entry-title entry)
+               ,(format-time-string "%F" (elfeed-entry-date entry))
+               ,(mapconcat 'symbol-name (elfeed-entry-tags entry) ", "))
+             " | "))
+
+(defun de/create-associative (entry-cons res)
+  "Create an associative list for the ENTRY-CONS in the proper filter determined by RES."
+  (mapcar de/pretty-entry entry-cons))
+
+(defun de/elfeed-list (list-size search-filter res)
   "Return a list of size LIST-SIZE of the feeds from elfeed.
 Will ensure the database is updated.
-Filter is determined by SEARCH-FILTER (which user shouldn't interact with).
+Filter is determined by SEARCH-FILTER and RES (which user shouldn't interact
+ with).
 The elfeed buffers are purposefully not closed."
   (switch-to-buffer "*elfeed-search*")
   (elfeed-search-mode)
   (elfeed-db-load)
   (elfeed-update)
   (elfeed-search-set-filter search-filter)
-  (setq de/dashboard-results elfeed-search-entries)
-  (print de/dashboard-results)
+  (setq res (mapcar 'de/pretty-entry elfeed-search-entries))
+  ;; DEBUG (print de/dashboard-results)
   (switch-to-buffer "*dashboard*")
-  de/dashboard-results)
+  res)
 
 (defun de/elfeed-list-interact (arg res)
   "Act on a single argument, ARG, from the list.
@@ -152,7 +166,7 @@ ARGS: KEY LIST-SIZE SEARCH-FILTER RES."
   (dashboard-insert-section
    (concat "Elfeed: [" search-filter "]")
    ;; list generated for dashboard
-   (de/elfeed-list list-size search-filter)
+   (de/elfeed-list list-size search-filter res)
    list-size
    key
    `(lambda (&rest ignore)
