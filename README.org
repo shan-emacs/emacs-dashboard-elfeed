@@ -65,11 +65,22 @@ this repository. You can either clone it or use quelpa.
 
 * Customization
 
+** Variables
+Variables the user can set:
+- =(de/key "<key>")= -- sets the dashboard shortcut jump key for the widget
+  - default value is =""=, effectively setting no key for the widget
+  - Any conflicts with other shortcuts ([[https://github.com/emacs-dashboard/emacs-dashboard#shortcuts][some that dashboard uses]]) will mess up the dashboard
+- =(de/dashboard-search-filter "<filter terms>")= -- set what the filter the widget should use
+  - default value is ="@6-months-ago +unread"=
+  - Look at [[https://github.com/skeeto/elfeed#filter-syntax][this]] for a better idea of filter terms
+
 ** Note about multiple
 To add in another section, simply use the configuration for a singular and add
 =-[1, 2, 3, 4]= to the variable.
 
-Eg: To add in a key for a second widget, do =(de/key-1 "b")=
+Eg:
+- To add in a key for a second widget, do =(de/key-1 "c")=
+- For a third widget, do =(de/key-1 "o")=
 
 * Wish List
   1. [X] Ability for multiple widgets
