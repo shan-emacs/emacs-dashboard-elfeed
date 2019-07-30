@@ -1,0 +1,63 @@
+* Emacs Dashboard Elfeed
+
+Display a filtered search from Elfeed in Dashboard widget.
+
+** Key Features
+- have up to 5 sections if user wants
+- specify filters for each section to use
+- open entry straight from dashboard in a popup buffer
+
+* Dependencies
+You will need the following packages which are all available on Melpa:
+
+1. dashboard - https://github.com/emacs-dashboard/emacs-dashboard
+2. elfeed - https://github.com/skeeto/elfeed
+3. (optional) elfeed-org - https://github.com/remyhonig/elfeed-org
+
+* Usage
+Currently, the package is not available on melpa yet, so you will have to use this repository. You can either clone it or use quelpa.
+
+** Sample configuration for 1 widget
+#+begin_src emacs-lisp
+  (use-package dashboard
+    :custom
+    :config
+    (use-package dashboard-elfeed
+      :load-path "/path/to/emacs-dashboard-elfeed"
+      :custom
+      (de/key "b")
+      (de/dashboard-search-filter "+friends")
+      :config
+      (add-to-list 'dashboard-item-generators '(elfeed . dashboard-elfeed))
+      (add-to-list 'dashboard-items '(elfeed) t))
+
+    (setq dashboard-items '((recents  . 5)
+                            (agenda . 5)
+                            (elfeed . 1))))
+#+end_src
+
+** Sample configuration for 3 widgets
+#+begin_src emacs-lisp
+  (use-package dashboard
+    :custom
+    :config
+    (use-package dashboard-elfeed
+      :load-path "/path/to/emacs-dashboard-elfeed"
+      :custom
+      (de/key "b")
+      (de/dashboard-search-filter "+friends")
+      (de/dashboard-search-filter-1 "+me")
+      :config
+      (add-to-list 'dashboard-item-generators '(elfeed . dashboard-elfeed))
+      (add-to-list 'dashboard-items '(elfeed) t)
+      (add-to-list 'dashboard-item-generators '(elfeed-1 . dashboard-elfeed-1))
+      (add-to-list 'dashboard-items '(elfeed-1) t)
+      (add-to-list 'dashboard-item-generators '(elfeed-2 . dashboard-elfeed-2))
+      (add-to-list 'dashboard-items '(elfeed-2) t))
+
+    (setq dashboard-items '((recents  . 5)
+                            (agenda . 5)
+                            (elfeed . 1)
+                            (elfeed-1 . 1)
+                            (elfeed-2 . 1))))
+#+end_src
