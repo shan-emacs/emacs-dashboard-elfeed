@@ -78,15 +78,15 @@ Filter is determined by RES (which user shouldn't interact with)."
       (elfeed-search-show-entry de/entry))
     (switch-to-buffer buffname)))
 
-(defun dashboard-elfeed-template (list-size search-filter res)
-  "Add the elfeed functionality to dashboard.
-Makes the list as long as LIST-SIZE."
+(defun dashboard-elfeed-template (list-size key search-filter res)
+  "Add the template dashboard widgets.
+ARGS: KEY LIST-SIZE SEARCH-FILTER RES."
   (dashboard-insert-section
    (concat "Elfeed: [" de/dashboard-search-filter "]")
    ;; list generated for dashboard
    (de/elfeed-list list-size search-filter res)
    list-size
-   de/key
+   key
    ;; decide what to do when user clicks on item
    `(lambda (&rest ignore)
       (de/elfeed-list-interact ',el res))
@@ -96,17 +96,12 @@ Makes the list as long as LIST-SIZE."
 (defun dashboard-elfeed (list-size)
   "Add the elfeed functionality to dashboard.
 Makes the list as long as LIST-SIZE."
-  (dashboard-insert-section
-   (concat "Elfeed: [" de/dashboard-search-filter "]")
-   ;; list generated for dashboard
-   (de/elfeed-list list-size de/dashboard-search-filter de/dashboard-results)
-   list-size
-   de/key
-   ;; decide what to do when user clicks on item
-   `(lambda (&rest ignore)
-      (de/elfeed-list-interact ',el de/dashboard-results))
-   ;; displays list in dashboard
-   (format "%s" el)))
+  (dashboard-elfeed-template list-size
+                             de/key
+                             de/dashboard-search-filter
+                             de/dashboard-results))
+
+
 
 (provide 'dashboard-elfeed)
 ;;; dashboard-elfeed.el ends here
