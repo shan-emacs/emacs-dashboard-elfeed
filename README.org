@@ -25,7 +25,6 @@ can either clone it or use quelpa.
 ** Sample configuration for 1 widget
 #+begin_src emacs-lisp
   (use-package dashboard
-    :custom
     :config
     (use-package dashboard-elfeed
       :load-path "/path/to/emacs-dashboard-elfeed"
@@ -44,7 +43,6 @@ can either clone it or use quelpa.
 ** Sample configuration for 3 widgets
 #+begin_src emacs-lisp
   (use-package dashboard
-    :custom
     :config
     (use-package dashboard-elfeed
       :load-path "/path/to/emacs-dashboard-elfeed"
