@@ -15,7 +15,8 @@ You will need the following packages which are all available on Melpa:
 3. (optional) elfeed-org - https://github.com/remyhonig/elfeed-org
 
 * Usage
-Currently, the package is not available on melpa yet, so you will have to use this repository. You can either clone it or use quelpa.
+Currently, the package is not available on melpa yet, so you will have to use
+this repository. You can either clone it or use quelpa.
 
 ** Sample configuration for 1 widget
 #+begin_src emacs-lisp
@@ -61,3 +62,17 @@ Currently, the package is not available on melpa yet, so you will have to use th
                             (elfeed-1 . 1)
                             (elfeed-2 . 1))))
 #+end_src
+
+* Customization
+
+** Note about multiple
+To add in another section, simply use the configuration for a singular and add
+=-[1, 2, 3, 4]= to the variable.
+
+Eg: To add in a key for a second widget, do =(de/key-1 "b")=
+
+* Wish List
+  1. [X] Ability for multiple widgets
+  2. [ ] Have faces for color
+  3. [ ] Prettify display
+  4. [ ] Asynchronous updates
