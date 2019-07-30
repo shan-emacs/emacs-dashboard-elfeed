@@ -19,8 +19,8 @@ You will need the following packages which are all available on Melpa:
 3. (optional) elfeed-org - https://github.com/remyhonig/elfeed-org
 
 * Usage
-Currently, the package is not available on melpa yet, so you will have to use
-this repository. You can either clone it or use quelpa.
+Currently, the package is not available on melpa yet, so you will have to use this repository. You
+can either clone it or use quelpa.
 
 ** Sample configuration for 1 widget
 #+begin_src emacs-lisp
@@ -79,8 +79,8 @@ Variables the user can set:
   - Look at [[https://github.com/skeeto/elfeed#filter-syntax][this]] for a better idea of filter terms
 
 ** Note about multiple
-To add in another section, simply use the configuration for a singular and add
-=-[1, 2, 3, 4]= to the variable.
+To add in another section, simply use the configuration for a singular and add =-[1, 2, 3, 4]= to the
+ variable.
 
 Eg:
 - To add in a key for a second widget, do =(de/key-1 "c")=
@@ -99,3 +99,9 @@ Eg:
   - This is unlikely to happen, but it may be worth looking into hashtables
   - Another possible solution (simpler/ foolproof) may be assigning an arbitrary key in display text
 - When the user views the entry from dashboard, the entry is unmarked unread
+
+* How you can contribute
+
+Feel free to fork and make a pull request. I check github quite often, so I'll reply if I want any
+clarification, and accept/ reject (rejections will receive a justified reason as to why they were
+rejected). Looking for contributors and maintainers!
