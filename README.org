@@ -7,6 +7,10 @@ Display a filtered search from Elfeed in Dashboard widget.
 - specify filters for each section to use
 - open entry straight from dashboard in a popup buffer
 
+* Demo
+
+[[./examples/demo.gif]]
+
 * Dependencies
 You will need the following packages which are all available on Melpa:
 
@@ -58,9 +62,9 @@ this repository. You can either clone it or use quelpa.
 
     (setq dashboard-items '((recents  . 5)
                             (agenda . 5)
-                            (elfeed . 1)
+                            (elfeed . 5)
                             (elfeed-1 . 1)
-                            (elfeed-2 . 1))))
+                            (elfeed-2 . 3))))
 #+end_src
 
 * Customization
@@ -87,3 +91,11 @@ Eg:
   2. [ ] Have faces for color
   3. [ ] Prettify display
   4. [ ] Asynchronous updates
+  5. [ ] Possibly cleaner code for duplicates
+
+* Bugs
+- Doesn't update for new feeds (requires user manually updating first)
+- If a feed published 2 entries with the same title and attributes, it won't return them properly
+  - This is unlikely to happen, but it may be worth looking into hashtables
+  - Another possible solution (simpler/ foolproof) may be assigning an arbitrary key in display text
+- When the user views the entry from dashboard, the entry is unmarked unread
