@@ -57,27 +57,41 @@ Will ensure the database is updated.
 Filter is determined by SEARCH-FILTER and RES (which user shouldn't interact
  with)."
   `(progn
-     (set-buffer (get-buffer-create "*elfeed-search*"))
-     (elfeed-search-mode)
-     (elfeed-db-load)
-     (elfeed-update)
-     (setq de/search (concat ,search-filter " #" (number-to-string (+ 5 ,list-size))))
-     (elfeed-search-set-filter de/search)
-     (setq de/entries elfeed-search-entries)
-     (kill-buffer "*elfeed-search*")
-     (switch-to-buffer "*dashboard*")
+     (with-temp-buffer
+       (elfeed-search-mode)
+       (elfeed-db-load)
+       (elfeed-update)
+       (setq de/search (concat ,search-filter " #" (number-to-string (+ 5 ,list-size))))
+       (elfeed-search-set-filter de/search)
+       (setq de/entries elfeed-search-entries)
+       (kill-buffer "*elfeed-search*"))
      (setq ,res (mapcar* 'cons (mapcar 'de/pretty-entry de/entries) de/entries))
      (mapcar 'de/pretty-entry de/entries)))
 
 (defun de/elfeed-list-interact (arg res)
-  "Act on a single argument, ARG, from the list.
+  "Display a single entry, ARG, from the list.
 Filter is determined by RES (which user shouldn't interact with)."
-  (let ((buffer (get-buffer-create "*elfeed-entry*")))
-    (with-current-buffer buffer
+  (let ((buffname (get-buffer-create "*elfeed-entry*")))
+    (with-current-buffer buffname
       (elfeed-show-mode)
       (setq de/entry (nth (cl-position arg (mapcar 'car res) :test 'equal) (mapcar 'cdr res)))
-      (elfeed-show-entry de/entry))
-    (switch-to-buffer buffer)))
+      (elfeed-search-show-entry de/entry))
+    (switch-to-buffer buffname)))
+
+(defun dashboard-elfeed-template (list-size search-filter res)
+  "Add the elfeed functionality to dashboard.
+Makes the list as long as LIST-SIZE."
+  (dashboard-insert-section
+   (concat "Elfeed: [" de/dashboard-search-filter "]")
+   ;; list generated for dashboard
+   (de/elfeed-list list-size search-filter res)
+   list-size
+   de/key
+   ;; decide what to do when user clicks on item
+   `(lambda (&rest ignore)
+      (de/elfeed-list-interact ',el res))
+   ;; displays list in dashboard
+   (format "%s" el)))
 
 (defun dashboard-elfeed (list-size)
   "Add the elfeed functionality to dashboard.
