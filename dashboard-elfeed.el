@@ -122,7 +122,7 @@ Filter is determined by RES (which user shouldn't interact with)."
   (let ((buffname (get-buffer-create "*elfeed-entry*")))
     (with-current-buffer buffname
       (elfeed-show-mode)
-      (setq de/entry (nth (cl-position arg (mapcar 'car res) :test 'equal) (mapcar 'cdr res)))
+      (setq de/entry (assoc-default arg res))
       (elfeed-search-show-entry de/entry))
     (switch-to-buffer buffname)))
 
@@ -130,6 +130,7 @@ Filter is determined by RES (which user shouldn't interact with)."
   "Add the elfeed functionality to dashboard.
 Makes the list as long as LIST-SIZE."
   (dashboard-insert-section
+   ;; widget title
    (concat "Elfeed: [" de/dashboard-search-filter "]")
    ;; list generated for dashboard
    (de/elfeed-list list-size de/dashboard-search-filter de/dashboard-results)
