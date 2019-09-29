@@ -84,6 +84,8 @@ Eg:
 - To add in a key for a second widget, do =(de/key-1 "c")=
 - For a third widget, do =(de/key-1 "o")=
 
+* Tips
+
 * Wish List
   1. [X] Ability for multiple widgets
   2. [ ] Have faces for color

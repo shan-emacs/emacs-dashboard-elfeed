@@ -105,14 +105,14 @@ Will ensure the database is updated.
 Filter is determined by SEARCH-FILTER and RES (which user shouldn't interact
  with)."
   `(progn
-     (with-temp-buffer
-       (elfeed-search-mode)
+     (save-current-buffer
+       (set-buffer (elfeed-search-buffer))
+       (unless (eq major-mode 'elfeed-search-mode)
+         (elfeed-search-mode))
        (elfeed-db-load)
-       (elfeed-update)
        (setq de/search (concat ,search-filter " #" (number-to-string (+ 5 ,list-size))))
        (elfeed-search-set-filter de/search)
-       (setq de/entries elfeed-search-entries)
-       (kill-buffer "*elfeed-search*"))
+       (setq de/entries elfeed-search-entries))
      (setq ,res (mapcar* 'cons (mapcar 'de/pretty-entry de/entries) de/entries))
      (mapcar 'de/pretty-entry de/entries)))
 
